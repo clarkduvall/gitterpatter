@@ -1,0 +1,63 @@
+$maxWidth: 256px
+$maxHeight: 256px
+
+body
+  -webkit-transform-style: preserve-3d
+  -webkit-perspective: 1000
+  color: #333
+  font: 13px Helvetica, arial, freesans, clean, sans-serif
+
+.wrapper
+  width: $maxWidth
+  height: $maxHeight
+  margin-top: -$maxHeight / 2
+  margin-left: -$maxWidth / 2
+  text-align: center
+  box-sizing: border-box
+
+.cover
+  position: absolute
+  top: 0
+  left: 0
+  height: 96px
+  width: 96px
+  border-radius: 50%
+  background: rgba(0,0,0,0)
+  box-sizing: border-box
+  border: 48px solid #e5e5e5
+  pointer-events: none
+
+  &.splat
+    border-width: 2px
+    width: $maxWidth
+    height: $maxHeight
+    -webkit-transition: all .2s ease-out
+    transition: all .2s ease-out
+
+.drop
+  display: inline-block
+  height: 96px
+  width: 96px
+  margin: 80px
+  border-radius: 50%
+  background: #f3f3f3
+  box-sizing: border-box
+  opacity: 1
+  overflow: hidden
+  pointer-events: none
+
+  a
+    pointer-events: auto
+
+  &.splat
+    margin: 0
+    width: $maxWidth
+    height: $maxHeight
+    padding: 20px
+    -webkit-transition: all .2s ease-out
+    transition: all .2s ease-out
+
+  .avatar
+    border-radius: 50%
+    width: 96px
+    height: 96px
