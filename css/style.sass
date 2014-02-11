@@ -1,11 +1,22 @@
-$maxWidth: 256px
-$maxHeight: 256px
+$maxWidth: 312px
+$maxHeight: 312px
+
+@mixin box-sizing($val)
+  box-sizing: $val
+  -moz-box-sizing: $val
 
 body
-  -webkit-transform-style: preserve-3d
-  -webkit-perspective: 1000
   color: #333
   font: 13px Helvetica, arial, freesans, clean, sans-serif
+
+html
+  overflow: hidden
+
+//#gitter
+//  -webkit-transform-style: preserve-3d
+//  -webkit-perspective: 1000px
+//  transform-style: preserve-3d
+//  perspective: 1000px
 
 .wrapper
   width: $maxWidth
@@ -13,7 +24,8 @@ body
   margin-top: -$maxHeight / 2
   margin-left: -$maxWidth / 2
   text-align: center
-  box-sizing: border-box
+  +box-sizing(border-box)
+  pointer-events: none
 
 .cover
   position: absolute
@@ -23,41 +35,51 @@ body
   width: 96px
   border-radius: 50%
   background: rgba(0,0,0,0)
-  box-sizing: border-box
+  +box-sizing(border-box)
   border: 48px solid #e5e5e5
   pointer-events: none
 
   &.splat
-    border-width: 2px
+    border-width: 5px
     width: $maxWidth
     height: $maxHeight
-    -webkit-transition: all .2s ease-out
-    transition: all .2s ease-out
+    -webkit-transition: all .15s ease-out
+    -moz-transition: all .15s ease-out
+    transition: all .15s ease-out
 
 .drop
   display: inline-block
   height: 96px
   width: 96px
-  margin: 80px
+  margin: 108px
   border-radius: 50%
   background: #f3f3f3
-  box-sizing: border-box
+  +box-sizing(border-box)
   opacity: 1
   overflow: hidden
+  font-size: 18px
   pointer-events: none
 
   a
     pointer-events: auto
+    text-decoration: none
+    font-weight: bold
+    color: #222
+
+    &:hover
+      text-decoration: underline
 
   &.splat
     margin: 0
     width: $maxWidth
     height: $maxHeight
-    padding: 20px
-    -webkit-transition: all .2s ease-out
-    transition: all .2s ease-out
+    padding: 30px
+    -webkit-transition: all .15s ease-out
+    -moz-transition: all .15s ease-out
+    transition: all .15s ease-out
 
   .avatar
+    margin-bottom: 20px
     border-radius: 50%
     width: 96px
     height: 96px
