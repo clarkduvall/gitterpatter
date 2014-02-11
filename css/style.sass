@@ -5,9 +5,15 @@ $maxHeight: 312px
   box-sizing: $val
   -moz-box-sizing: $val
 
+@mixin transition($val)
+  -webkit-transition: $val
+  -moz-transition: $val
+  transition: $val
+
 body
   color: #333
   font: 13px Helvetica, arial, freesans, clean, sans-serif
+  margin: 0
 
 html
   overflow: hidden
@@ -43,9 +49,7 @@ html
     border-width: 5px
     width: $maxWidth
     height: $maxHeight
-    -webkit-transition: all .15s ease-out
-    -moz-transition: all .15s ease-out
-    transition: all .15s ease-out
+    +transition(all .15s ease-out)
 
 .drop
   display: inline-block
@@ -74,12 +78,37 @@ html
     width: $maxWidth
     height: $maxHeight
     padding: 30px
-    -webkit-transition: all .15s ease-out
-    -moz-transition: all .15s ease-out
-    transition: all .15s ease-out
+    +transition(all .15s ease-out)
 
   .avatar
     margin-bottom: 20px
     border-radius: 50%
     width: 96px
     height: 96px
+
+#controls
+  position: absolute
+  top: 0
+  left: 50%
+  width: 500px
+  margin-left: -250px
+  background: #f3f3f3
+  border: 5px solid #e5e5e5
+  border-top: none
+  border-bottom-left-radius: 10px
+  border-bottom-right-radius: 10px
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4)
+
+.customSelect
+  background: #e5e5e5
+  padding: 10px 40px 10px 10px
+
+  &:after
+    border: 4px solid #333
+    border-right-color: transparent
+    border-left-color: transparent
+    border-bottom-color: transparent
+    content: ""
+    position: relative
+    top: 10px
+    left: 10px

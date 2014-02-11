@@ -135,7 +135,7 @@
         return 'added ' + userLink(data.payload.user) + ' to ' +
             data.payload.team.name;
       } else {
-        return 'added ' + repoLink(data.payload.repo) + ' to ' +
+        return 'added ' + repoLink(data.payload.repository) + ' to ' +
             data.payload.team.name;
       }
     },
@@ -207,8 +207,7 @@
   };
 
   function Activity(data) {
-    this.rot = Math.random() * 360;
-    this.drot = Math.random() * 40 - 20;
+    this.rot = Math.random() * 90 - 45;
     this.z = 1500 + Math.random() * 3000;
     this.dz = Math.random() * 2000;
     this.opacity = 1;
@@ -234,9 +233,10 @@
     $profile.attr('href', this.actorURL).text(this.actor.login);
 
     $drop.append($avatarWrapper)
-         .append($('<br>'))
+         .append('<br>')
          .append($profile)
-         .append(' ' + eventTypes[data.type](data))
+         .append(' ' + eventTypes[data.type](data) + ' ' +
+             moment(data.created_at).fromNow())
          .append($cover);
     $wrapper.append($drop);
 
@@ -274,7 +274,6 @@
     if (this.splatting) {
       this.opacity -= delta / 8;
     } else {
-      this.rot += delta * this.drot;
       this.dz += delta * 100;
       this.z -= this.dz * delta;
 
