@@ -1,30 +1,85 @@
 <!doctype html>
 <html>
   <head>
+    <title>Gitter Patter - It's Raining GitHub!</title>
+    <link rel="icon" href="favicon.ico">
+    <meta name="description" content="Watch GitHub events rain down from the heavens">
     <link type="text/css" rel="stylesheet" href="/css/style.css">
   </head>
   <body>
+    <div id="fb-root"></div>
     <div id="gitter">
     </div>
     <div id="controls">
-      <h1 align="center">Gitter Patter</h1>
-      <p>
-        Rain down events
-        <select class="styled">
-          <option value="foo">from everyone</option>
-          <option value="1">for organization</option>
-          <option value="2">for repository</option>
-          <option value="3">performed by user</option>
-          <option value="4">received by user</option>
-        </select>
-        named
-        <input type="text">
-      </p>
+      <h1>Gitter Patter</h1>
+      <span class="by">By <a href="http://clarkduvall.com" target="_blank">Clark DuVall</a></span>
+
+      <h3>Rain source - <span class="comp-text">events</span></h3>
+      <form class="composition">
+        <div>
+          <select class="comp-select">
+            <option value="all">All</option>
+            <option value="repo">Repository</option>
+            <option value="org">Organization</option>
+            <option value="rec-user">Received by user</option>
+            <option value="perf-user">Performed by user</option>
+          </select>
+        </div>
+        <div class="comp repo">
+          <input type="text" name="user" placeholder="username"> / <input type="text" name="repo" placeholder="repository">
+        </div>
+        <div class="comp org">
+          <input type="text" name="org" placeholder="organization">
+        </div>
+        <div class="comp rec-user">
+          <input type="text" name="user" placeholder="username">
+        </div>
+        <div class="comp perf-user">
+          <input type="text" name="user" placeholder="username">
+        </div>
+        <button class="comp-button">Update</button>
+      </form>
+
+      <h3>Rain rate - <span class="rate-text">heavy rain</span></h3>
+      <div class="control-box">
+        <div class="toggle rate rate1" data-rate="3" data-text="trickle">
+        </div><div class="toggle rate rate2" data-rate="2" data-text="sprinkle">
+        </div><div class="toggle rate rate3 selected" data-rate="1" data-text="heavy rain">
+        </div><div class="toggle rate rate4" data-rate=".6" data-text="downpour">
+        </div><div class="toggle rate rate5" data-rate=".2" data-text="monsoon">
+        </div>
+      </div>
+
+      <h3>Fade rate - <span class="fade-text">normal</span></h3>
+      <div class="control-box">
+        <div class="toggle fade fade1" data-rate="20" data-text="slooooow">
+        </div><div class="toggle fade fade2 selected" data-rate="8" data-text="normal">
+        </div><div class="toggle fade fade3" data-rate="2" data-text="fast">
+        </div>
+      </div>
+
+      <div class="social">
+        <div class="btn">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-via="theclarkatron" data-size="large" data-hashtags="gitterpatter">Tweet</a>
+        </div>
+        <div class="btn">
+          <div class="fb-share-button" data-href="http://developers.facebook.com/docs/plugins/" data-type="button_count"></div>
+        </div>
+      </div>
+
     </div>
     <script type="text/javascript" src="//code.jquery.com/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
-    <script type="text/javascript" src="/js/jquery.customSelect.min.js"></script>
     <script type="text/javascript" src="/js/gitterpatter.js"></script>
     <script type="text/javascript" src="/js/controls.js"></script>
+
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=1398947280353607";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
   </body>
 </html>

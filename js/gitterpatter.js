@@ -142,11 +142,14 @@
 
     WatchEvent: function(data) {
       return 'starred ' + repoLink(data.repo);
-    }
+    },
+
+    Error: function(data) {
+      return data.error;
+    },
   };
 
   $.fn.transform = function(z, rot) {
-    //var transform = 'rotateZ(' + rot + 'deg) translateZ(' + z + 'px)';
     var scale = Math.min(10, 1000 / (1000 - z)),
         transform = 'rotate(' + rot + 'deg) scale(' + scale + ',' + scale +')';
     $(this).css('-webkit-transform', transform);
@@ -154,12 +157,23 @@
     $(this).css('transform', transform);
   };
 
+  function getQueryURL() {
+    var search = document.location.search;
+    if (search && search.match(/^\?url=/))
+      return decodeURIComponent(search.replace('?url=', '').replace(/\/$/, ''));
+
+    return '';
+  }
+
   function EventStream(cb, newEventTime) {
+    var queryURL = getQueryURL();
+
     this.events = [];
     this.timer = 0;
     this.newEventTime = newEventTime || 1;
     this.callback = cb;
-    this.populate();
+    console.log(queryURL);
+    this.setURL(queryURL || 'events');
   }
 
   EventStream.prototype.update = function(delta) {
@@ -196,14 +210,50 @@
   EventStream.prototype.fetch = function(cb) {
     var that = this;
 
-    $.get('https://api.github.com/events', function(data) {
+    this.request = $.getJSON(this.url, function(data) {
       //data = JSON.parse(data);
       $.each(data, function(index, value) {
         that.events.push(value);
       });
 
       if (cb) cb();
+    }).fail(function(req) {
+      if (req.status === 403) {
+        // Repeat 10 times so we don't hammer github.
+        for (var i = 0; i < 10; ++i) {
+          that.events.push({
+            type: 'Error',
+            created_at: req.getResponseHeader('X-RateLimit-Reset') * 1000,
+            error: 'You\'ve hit the Github API limit. The rain will begin again'
+          });
+        }
+      } else if (req.status === 404) {
+        for (var i = 0; i < 10; ++i) {
+          that.events.push({
+            type: 'Error',
+            error: 'The repo/user/org you requested does not exist'
+          });
+        }
+      } else {
+        that.events.push({
+          type: 'Error',
+          error: 'An unknown error has occurred'
+        });
+      }
+
+      if (cb) cb();
     });
+  };
+
+  EventStream.prototype.setURL = function(url) {
+    // EventStream shouldn't touch the HTML but... whatever.
+    $('.comp-text').text(url);
+
+    this.url = 'https://api.github.com/' + url;
+    if (this.request) this.request.abort();
+    this.populating = false;
+    this.events = [];
+    this.populate();
   };
 
   function Activity(data) {
@@ -212,32 +262,51 @@
     this.dz = Math.random() * 2000;
     this.opacity = 1;
 
-    this.actor = data.actor;
-    // Create the URL ourselves to avoid another API call.
-    this.actorURL = data.actor.url.replace('https://api.', '//')
-                                  .replace('users/', '');
+    if (data.actor) {
+      this.actor = data.actor;
+      // Create the URL ourselves to avoid another API call.
+      this.actorURL = data.actor.url.replace('https://api.', '//')
+                                    .replace('users/', '');
+    }
+
     this.$el = this.createNode(data);
   }
+
+  Activity.prototype.fadeRate = 8;
 
   Activity.prototype.createNode = function(data) {
     var $wrapper = $('<div class="wrapper">'),
         $drop = $('<div class="drop">'),
         $cover = $('<div class="cover">'),
+        $content = $('<div class="content">'),
         $avatar = $('<img class="avatar">'),
         $avatarWrapper = $('<a target="_blank">'),
         $profile = $('<a target="_blank" class="profile">');
 
-    $avatarWrapper.attr('href', this.actorURL);
     $avatarWrapper.append($avatar);
-    $avatar.attr('src', this.actor.avatar_url);
-    $profile.attr('href', this.actorURL).text(this.actor.login);
 
-    $drop.append($avatarWrapper)
-         .append('<br>')
-         .append($profile)
-         .append(' ' + eventTypes[data.type](data) + ' ' +
-             moment(data.created_at).fromNow())
+    $content.append($avatarWrapper)
+            .append('<br>')
+
+    if (this.actor) {
+      $avatarWrapper.attr('href', this.actorURL);
+      $avatar.attr('src', this.actor.avatar_url);
+      $profile.attr('href', this.actorURL).text(this.actor.login);
+
+      $content.append($profile);
+    } else {
+      $avatarWrapper.attr('href', 'https://github.com/clarkduvall');
+      $avatar.attr('src', 'https://gravatar.com/avatar/8cd29bab079d31af82c84d' +
+                          '95e8ff25ba?d=https%3A%2F%2Fidenticons.github.com%2' +
+                          'F58b20f14d8c0c808eff1919790056e92.png&r=x');
+    }
+
+    $content.append(' ' + eventTypes[data.type](data) +
+        (data.created_at ? ' ' + moment(data.created_at).fromNow() : ''));
+
+    $drop.append($content)
          .append($cover);
+
     $wrapper.append($drop);
 
     $wrapper.css({
@@ -272,7 +341,7 @@
 
   Activity.prototype.update = function(delta) {
     if (this.splatting) {
-      this.opacity -= delta / 8;
+      this.opacity -= delta / this.fadeRate;
     } else {
       this.dz += delta * 100;
       this.z -= this.dz * delta;
@@ -339,6 +408,40 @@
     var list = new ActivityList(),
         stream = new EventStream(list.add.bind(list), 1),
         animator = new Animator([list, stream]);
+
+    $('.rate').click(function() {
+      stream.newEventTime = parseFloat($(this).data('rate'));
+    });
+
+    $('.fade').click(function() {
+      Activity.prototype.fadeRate = parseInt($(this).data('rate'), 10);
+    });
+
+    $('.composition').submit(function(e) {
+      e.preventDefault();
+
+      var val = $('.comp-select :selected').val(),
+          $div = $('.' + val),
+          url = '';
+
+      if (val === 'all') {
+        url = 'events';
+      } else if (val === 'repo') {
+        url = 'repos/' + $div.find('[name="user"]').val() + '/' +
+            $div.find('[name="repo"]').val() + '/events';
+      } else if (val === 'org') {
+        url = 'orgs/' + $div.find('[name="org"]').val() + '/events';
+      } else if (val === 'rec-user') {
+        url = 'users/' + $div.find('[name="user"]').val() + '/received_events';
+      } else if (val === 'perf-user') {
+        url = 'users/' + $div.find('[name="user"]').val() + '/events';
+      }
+
+      stream.setURL(url);
+
+      if (history.pushState)
+        history.pushState({}, '', '?url=' + encodeURIComponent(url));
+    });
 
     animator.step();
   });
