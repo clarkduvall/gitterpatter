@@ -169,6 +169,7 @@
     var queryURL = getQueryURL();
 
     this.events = [];
+    this.ids = {};
     this.timer = 0;
     this.newEventTime = newEventTime || 1;
     this.callback = cb;
@@ -201,8 +202,11 @@
     if (this.events.length < 10) {
       this.populating = true;
       this.fetch(function() {
-        that.populating = false;
-        that.populate();
+        // Only check every 2 seconds.
+        setTimeout(function() {
+          that.populating = false;
+          that.populate();
+        }, 2000);
       });
     }
   };
@@ -210,38 +214,64 @@
   EventStream.prototype.fetch = function(cb) {
     var that = this;
 
-    this.request = $.getJSON(this.url, function(data) {
-      //data = JSON.parse(data);
-      $.each(data, function(index, value) {
-        that.events.push(value);
-      });
+    this.request = $.ajax({
+      dataType: 'json',
+      url: this.url,
+      beforeSend: function(req) {
+        if (that.lastETag)
+          req.setRequestHeader('If-None-Match', that.lastETag);
+      },
 
-      if (cb) cb();
-    }).fail(function(req) {
-      if (req.status === 403) {
-        // Repeat 10 times so we don't hammer github.
-        for (var i = 0; i < 10; ++i) {
-          that.events.push({
-            type: 'Error',
-            created_at: req.getResponseHeader('X-RateLimit-Reset') * 1000,
-            error: 'You\'ve hit the Github API limit. The rain will begin again'
-          });
-        }
-      } else if (req.status === 404) {
-        for (var i = 0; i < 10; ++i) {
-          that.events.push({
-            type: 'Error',
-            error: 'The repo/user/org you requested does not exist'
-          });
-        }
-      } else {
-        that.events.push({
-          type: 'Error',
-          error: 'An unknown error has occurred'
+      success: function(data, text, req) {
+        that.lastETag = req.getResponseHeader('ETag');
+
+        data = data.filter(function(item) {
+          return !that.ids[item.id];
         });
-      }
 
-      if (cb) cb();
+        if (data.length) {
+          $.each(data, function(index, value) {
+            that.ids[value.id] = true;
+            that.events.push(value);
+          });
+        } else {
+          for (var i = 0; i < 5; ++i) {
+            that.events.push({
+              type: 'Error',
+              error: 'No new events have happened! :('
+            });
+          }
+        }
+      },
+
+      error: function(req) {
+        if (req.status === 403) {
+          // Repeat 10 times so we don't hammer github.
+          for (var i = 0; i < 10; ++i) {
+            that.events.push({
+              type: 'Error',
+              created_at: req.getResponseHeader('X-RateLimit-Reset') * 1000,
+              error: 'You\'ve hit the Github API limit. The rain will begin again'
+            });
+          }
+        } else if (req.status === 404) {
+          for (var i = 0; i < 10; ++i) {
+            that.events.push({
+              type: 'Error',
+              error: 'The repo/user/org you requested does not exist'
+            });
+          }
+        } else {
+          that.events.push({
+            type: 'Error',
+            error: 'An unknown error has occurred'
+          });
+        }
+      },
+
+      complete: function() {
+        if (cb) cb();
+      }
     });
   };
 
@@ -253,6 +283,7 @@
     if (this.request) this.request.abort();
     this.populating = false;
     this.events = [];
+    this.ids = {};
     this.populate();
   };
 
