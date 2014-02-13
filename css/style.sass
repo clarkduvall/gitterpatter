@@ -17,7 +17,9 @@ body
   font: 13px Ruda, Helvetica, arial, freesans, clean, sans-serif
   margin: 0
 
-html
+html,
+body,
+#gitter
   overflow: hidden
 
 .wrapper
@@ -30,76 +32,118 @@ html
   pointer-events: none
 
 .cover
-  position: absolute
-  top: 0
-  left: 0
-  height: 96px
-  width: 96px
-  border-radius: 50%
-  background: rgba(0,0,0,0)
-  +box-sizing(border-box)
   border: 48px solid #e5e5e5
 
-  &.splat
-    border-width: 5px
-    width: $maxWidth
-    height: $maxHeight
-    +transition(all .15s ease-out)
+.drop
+  background: #f3f3f3
+
+#gitter
+  .cover
+    position: absolute
+    top: 0
+    left: 0
+    height: 96px
+    width: 96px
+    border-radius: 50%
+    background: rgba(0,0,0,0)
+    +box-sizing(border-box)
+
+    &.splat
+      border-width: 5px
+      width: $maxWidth
+      height: $maxHeight
+      +transition(all .15s ease-out)
+      pointer-events: none
+
+  .drop
+    display: inline-block
+    height: 96px
+    width: 96px
+    margin: 108px
+    border-radius: 50%
+    +box-sizing(border-box)
+    opacity: 1
+    overflow: hidden
+    font-size: 18px
     pointer-events: none
 
-.drop
-  display: inline-block
-  height: 96px
-  width: 96px
-  margin: 108px
-  border-radius: 50%
-  background: #f3f3f3
-  +box-sizing(border-box)
-  opacity: 1
-  overflow: hidden
-  font-size: 18px
-  pointer-events: none
-
-  .content
-    // Display none so content is not clickable until it lands.
-    display: none
-
-  a
-    pointer-events: auto
-    text-decoration: none
-    font-weight: bold
-    color: #222
-
-    &:hover
-      text-decoration: underline
-
-  &.splat
-    margin: 0
-    width: $maxWidth
-    height: $maxHeight
-    padding: 30px
-    +transition(all .15s ease-out)
-
     .content
-      display: block
+      // Display none so content is not clickable until it lands.
+      display: none
 
-  .avatar
-    margin-bottom: 20px
-    border-radius: 50%
-    width: 96px
-    height: 96px
+    a
+      pointer-events: auto
+      text-decoration: none
+      font-weight: bold
+      color: inherit
+
+      &:hover
+        text-decoration: underline
+
+    &.splat
+      margin: 0
+      width: $maxWidth
+      height: $maxHeight
+      padding: 30px
+      +transition(all .15s ease-out)
+
+      .content
+        display: block
+
+    .avatar
+      margin-bottom: 20px
+      border-radius: 50%
+      width: 96px
+      height: 96px
+
+.PushEvent
+  color: white
+
+  .cover
+    border-color: #aaa
+
+  .drop
+    background: #333
+
+.Error
+  color: white
+
+  .cover
+    border-color: #f88
+
+  .drop
+    background: #900
+
+.WatchEvent
+  color: #333
+
+  .cover
+    border-color: #333
+
+  .drop
+    background: #ffd700
+
+.ForkEvent
+  color: white
+
+  .cover
+    border-color: #004
+
+  .drop
+    background: #88a
 
 #controls
   position: absolute
   top: 0
   left: 0
-  background: rgba(255, 255, 255, 0.3)
+  background: rgba(255, 255, 255, 0.4)
+  box-shadow: 0 0 15px 10px rgba(255, 255, 255, 0.4)
+  border-bottom-right-radius: 40px
   padding: 0 20px 20px 0
 
   h1
     font-size: 35px
-    margin-bottom: 0
-    margin-left: 5px
+    margin: 10px 0 0 5px
 
   h3
     margin: 20px 0 5px 5px
@@ -109,13 +153,13 @@ html
     font-size: 16px
     color: #888
 
-    a
-      font-weight: bold
-      text-decoration: none
-      color: #333
+  a
+    font-weight: bold
+    text-decoration: none
+    color: #333
 
-      &:hover
-        text-decoration: underline
+    &:hover
+      text-decoration: underline
 
   $size: 64px
   $inc: 10px
@@ -153,7 +197,7 @@ html
 
   .fade:after
     position: absolute
-    top: 30px
+    top: 32px
     font-size: 20px
     font-weight: bold
     width: $size
@@ -180,7 +224,7 @@ html
     border: 2px solid #666
     outline: none
     background: #e5e5e5
-    padding: 5px 10px
+    padding: 4px 10px
     color: #333
     border-radius: 5px
 
@@ -192,17 +236,21 @@ html
     color: #333
     border-radius: 5px
 
-  .comp-button
+    &:focus
+      border-color: #aaa
+
+  button
     border: none
     background: #333
     color: #f5f5f5
     border-radius: 5px
-    padding: 10px 20px
+    padding: 7px 12px
     margin-top: 5px
     font-weight: bold
 
     &:hover
       cursor: pointer
+      background: #444
 
   .social
     margin-top: 20px
@@ -210,3 +258,36 @@ html
 
     .btn
       margin-top: 5px
+
+  .login-controls
+    margin-top: 15px
+    margin-left: 5px
+
+    .logout-msg,
+    .login-error,
+    form
+      display: none
+
+    .login-error
+      color: #dd0000
+      margin-top: 5px
+      font-weight: bold
+
+    input
+      margin-top: 5px
+
+#key
+  position: absolute
+  right: 0
+  bottom: 0
+
+.event
+  border-radius: 50%
+  background: #f3f3f3
+  border: 5px solid #e5e5e5
+  width: 64px
+  height: 64px
+  display: inline-block
+  text-align: center
+  font-weight: bold
+  line-height: 64px

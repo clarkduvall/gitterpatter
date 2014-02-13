@@ -1,4 +1,6 @@
 (function() {
+  window.GP = window.GP || {};
+
   var $window = $(window),
       height = $window.height(),
       width = $window.width(),
@@ -8,6 +10,9 @@
                               window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame ||
                               window.msRequestAnimationFrame;
+
+  $('#gitter, html, body').width($window.width())
+                          .height($window.height());
 
   function repoLink(repo) {
     // Create the URL ourselves to avoid another API call.
@@ -173,7 +178,6 @@
     this.timer = 0;
     this.newEventTime = newEventTime || 1;
     this.callback = cb;
-    console.log(queryURL);
     this.setURL(queryURL || 'events');
   }
 
@@ -211,6 +215,11 @@
     }
   };
 
+  EventStream.prototype.setAuthHeader = function(header) {
+    this.authHeader = header;
+    this.setURL(this.rawURL);
+  };
+
   EventStream.prototype.fetch = function(cb) {
     var that = this;
 
@@ -220,10 +229,16 @@
       beforeSend: function(req) {
         if (that.lastETag)
           req.setRequestHeader('If-None-Match', that.lastETag);
+        if (that.authHeader)
+          req.setRequestHeader('Authorization', that.authHeader);
       },
 
       success: function(data, text, req) {
         that.lastETag = req.getResponseHeader('ETag');
+
+        // If this is not new data, pretend like we got an empty list.
+        if (req.status !== 200)
+          data = [];
 
         data = data.filter(function(item) {
           return !that.ids[item.id];
@@ -250,8 +265,10 @@
           for (var i = 0; i < 10; ++i) {
             that.events.push({
               type: 'Error',
+              rateLimit: true,
               created_at: req.getResponseHeader('X-RateLimit-Reset') * 1000,
-              error: 'You\'ve hit the Github API limit. The rain will begin again'
+              error: 'You\'ve hit the Github API limit. ' +
+                  ' The rain will begin again'
             });
           }
         } else if (req.status === 404) {
@@ -280,10 +297,12 @@
     $('.comp-text').text(url);
 
     this.url = 'https://api.github.com/' + url;
+    this.rawURL = url;
     if (this.request) this.request.abort();
     this.populating = false;
     this.events = [];
     this.ids = {};
+    delete this.lastETag;
     this.populate();
   };
 
@@ -312,7 +331,10 @@
         $content = $('<div class="content">'),
         $avatar = $('<img class="avatar">'),
         $avatarWrapper = $('<a target="_blank">'),
-        $profile = $('<a target="_blank" class="profile">');
+        $profile = $('<a target="_blank" class="profile">'),
+        $login;
+
+    $wrapper.addClass(data.type);
 
     $avatarWrapper.append($avatar);
 
@@ -334,6 +356,21 @@
 
     $content.append(' ' + eventTypes[data.type](data) +
         (data.created_at ? ' ' + moment(data.created_at).fromNow() : ''));
+
+    if (data.rateLimit) {
+      $content.append('. ');
+      $login = $('<a>');
+      $login.attr('href', '#');
+
+      $login.click(function(e) {
+        e.preventDefault();
+        $('.login-controls form').slideDown('fast');
+      });
+
+      $login.text('Login');
+      $content.append($login)
+              .append(' to increase API limit');
+    }
 
     $drop.append($content)
          .append($cover);
@@ -440,40 +477,13 @@
         stream = new EventStream(list.add.bind(list), 1),
         animator = new Animator([list, stream]);
 
-    $('.rate').click(function() {
-      stream.newEventTime = parseFloat($(this).data('rate'));
-    });
-
-    $('.fade').click(function() {
-      Activity.prototype.fadeRate = parseInt($(this).data('rate'), 10);
-    });
-
-    $('.composition').submit(function(e) {
-      e.preventDefault();
-
-      var val = $('.comp-select :selected').val(),
-          $div = $('.' + val),
-          url = '';
-
-      if (val === 'all') {
-        url = 'events';
-      } else if (val === 'repo') {
-        url = 'repos/' + $div.find('[name="user"]').val() + '/' +
-            $div.find('[name="repo"]').val() + '/events';
-      } else if (val === 'org') {
-        url = 'orgs/' + $div.find('[name="org"]').val() + '/events';
-      } else if (val === 'rec-user') {
-        url = 'users/' + $div.find('[name="user"]').val() + '/received_events';
-      } else if (val === 'perf-user') {
-        url = 'users/' + $div.find('[name="user"]').val() + '/events';
-      }
-
-      stream.setURL(url);
-
-      if (history.pushState)
-        history.pushState({}, '', '?url=' + encodeURIComponent(url));
-    });
-
     animator.step();
+
+    // These are used in controls.js.
+    GP.stream = stream;
+    GP.animator = animator;
+    GP.list = list;
   });
+
+  GP.Activity = Activity;
 })();
