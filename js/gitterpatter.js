@@ -6,10 +6,19 @@
       width = $window.width(),
       $gitter = $('#gitter'),
       eventTypes,
+      origSound = new Audio('water-drop.wav'),
       requestAnimationFrame = window.requestAnimationFrame ||
                               window.mozRequestAnimationFrame ||
                               window.webkitRequestAnimationFrame ||
                               window.msRequestAnimationFrame;
+
+  origSound.preload = 'auto';
+  origSound.load();
+
+  function playSound(volume) {
+    var sound = origSound.cloneNode();
+    sound.play();
+  }
 
   $('#gitter, html, body').width($window.width())
                           .height($window.height());
@@ -418,6 +427,7 @@
         this.$el.addClass('splat');
         this.$el.find('.cover').addClass('splat');
         this.splatting = true;
+        playSound();
       }
     }
 
