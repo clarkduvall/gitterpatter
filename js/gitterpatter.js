@@ -234,11 +234,12 @@
       },
 
       success: function(data, text, req) {
-        that.lastETag = req.getResponseHeader('ETag');
-
         // If this is not new data, pretend like we got an empty list.
-        if (req.status !== 200)
+        if (req.status === 200) {
+          that.lastETag = req.getResponseHeader('ETag');
+        } else {
           data = [];
+        }
 
         data = data.filter(function(item) {
           return !that.ids[item.id];
@@ -249,20 +250,18 @@
             that.ids[value.id] = true;
             that.events.push(value);
           });
-        } else {
-          for (var i = 0; i < 5; ++i) {
-            that.events.push({
-              type: 'Error',
-              error: 'No new events have happened! :('
-            });
-          }
+        } else if (req.status !== 200) {
+          that.events.push({
+            type: 'Error',
+            error: 'No more events to load! For now...'
+          });
         }
       },
 
       error: function(req) {
         if (req.status === 403) {
-          // Repeat 10 times so we don't hammer github.
-          for (var i = 0; i < 10; ++i) {
+          // Repeat 5 times so we don't hammer github.
+          for (var i = 0; i < 5; ++i) {
             that.events.push({
               type: 'Error',
               rateLimit: true,
@@ -272,7 +271,7 @@
             });
           }
         } else if (req.status === 404) {
-          for (var i = 0; i < 10; ++i) {
+          for (var i = 0; i < 5; ++i) {
             that.events.push({
               type: 'Error',
               error: 'The repo/user/org you requested does not exist'
