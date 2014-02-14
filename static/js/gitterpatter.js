@@ -208,24 +208,32 @@
 
   EventStream.prototype.fetch = function(cb) {
     var that = this,
-        data = {};
+        data = {},
+        page = 1;
 
-    if (this.token)
-      data['access_token'] = this.token;
+    if (this.token) {
+      data.access_token = this.token;
+      page = this.page;
+    }
+
+    data.page = page;
 
     this.request = $.ajax({
       dataType: 'json',
       url: this.url,
       data: data,
       beforeSend: function(req) {
-        if (that.lastETag)
-          req.setRequestHeader('If-None-Match', that.lastETag);
+        var eTag = that.eTags[page];
+        if (eTag)
+          req.setRequestHeader('If-None-Match', eTag);
       },
 
       success: function(data, text, req) {
+        var isOk = req.status === 200;
+
         // If this is not new data, pretend like we got an empty list.
-        if (req.status === 200) {
-          that.lastETag = req.getResponseHeader('ETag');
+        if (isOk) {
+          that.eTags[page] = req.getResponseHeader('ETag');
         } else {
           data = [];
         }
@@ -239,11 +247,16 @@
             that.ids[value.id] = true;
             that.events.push(value);
           });
-        } else if (req.status !== 200) {
-          that.events.push({
-            type: 'Error',
-            error: 'No more events to load! For now...'
-          });
+        } else {
+          if (isOk) {
+            that.events.push({
+              type: 'Error',
+              error: 'No more events to load! For now...'
+            });
+            that.page = 1;
+          } else {
+            that.page++;
+          }
         }
       },
 
@@ -287,12 +300,14 @@
     // EventStream shouldn't touch the HTML but... whatever.
     $('.comp-text').text(url);
 
-    this.url = 'https://api.github.com' + url;
     if (this.request) this.request.abort();
+
+    this.url = 'https://api.github.com' + url;
+    this.page = 1;
     this.populating = false;
     this.events = [];
     this.ids = {};
-    delete this.lastETag;
+    this.eTags = {};
     this.populate();
   };
 
