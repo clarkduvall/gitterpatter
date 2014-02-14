@@ -10,7 +10,6 @@ from flask import session
 from flask import url_for
 
 app = Flask(__name__, static_url_path='/s', static_folder='static')
-app.debug = True
 app.secret_key = os.environ['FLASK_SECRET']
 
 ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
