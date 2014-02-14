@@ -1,1 +1,1 @@
-web: gunicorn gitterpatter:app
+web: gunicorn gitterpatter:app -k gevent
