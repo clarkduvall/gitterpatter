@@ -21,7 +21,7 @@ def callback():
         'code': request.args.get('code', '')
     }, headers={'Accept': 'application/json'})
 
-    return response.json()
+    return response.content
 
 
 @app.route('/', defaults={'path': ''})
