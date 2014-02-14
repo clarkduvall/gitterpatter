@@ -40,22 +40,29 @@ $(function() {
         url = '';
 
     if (val === 'all') {
-      url = 'events';
+      url = '/events';
     } else if (val === 'repo') {
-      url = 'repos/' + $div.find('input[name="user"]').val() + '/' +
+      url = '/repos/' + $div.find('input[name="user"]').val() + '/' +
           $div.find('input[name="repo"]').val() + '/events';
     } else if (val === 'org') {
-      url = 'orgs/' + $div.find('input[name="org"]').val() + '/events';
+      url = '/orgs/' + $div.find('input[name="org"]').val() + '/events';
     } else if (val === 'rec-user') {
-      url = 'users/' + $div.find('input[name="user"]').val() +
+      url = '/users/' + $div.find('input[name="user"]').val() +
           '/received_events';
     } else if (val === 'perf-user') {
-      url = 'users/' + $div.find('input[name="user"]').val() + '/events';
+      url = '/users/' + $div.find('input[name="user"]').val() + '/events';
     }
 
     GP.stream.setURL(url);
 
-    if (history.pushState)
-      history.pushState({}, '', '?url=' + encodeURIComponent(url));
+    history.pushState({url: url}, '', url);
   });
+
+  $(window).bind('popstate', function(e) {
+    var state = e.originalEvent.state;
+    if (state)
+      GP.stream.setURL(state.url);
+  });
+
+  history.pushState({url: location.pathname}, '', location.pathname);
 });

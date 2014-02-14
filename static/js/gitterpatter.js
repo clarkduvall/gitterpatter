@@ -162,24 +162,14 @@
     $(this).css('transform', transform);
   };
 
-  function getQueryURL() {
-    var search = document.location.search;
-    if (search && search.match(/^\?url=/))
-      return decodeURIComponent(search.replace('?url=', '').replace(/\/$/, ''));
-
-    return '';
-  }
-
   function EventStream(cb, newEventTime, token) {
-    var queryURL = getQueryURL();
-
     this.events = [];
     this.ids = {};
     this.timer = 0;
     this.newEventTime = newEventTime;
     this.token = token;
     this.callback = cb;
-    this.setURL(queryURL || 'events');
+    this.setURL(location.pathname);
   }
 
   EventStream.prototype.update = function(delta) {
@@ -216,11 +206,6 @@
     }
   };
 
-  EventStream.prototype.setAuthHeader = function(header) {
-    this.authHeader = header;
-    this.setURL(this.rawURL);
-  };
-
   EventStream.prototype.fetch = function(cb) {
     var that = this,
         data = {};
@@ -235,8 +220,6 @@
       beforeSend: function(req) {
         if (that.lastETag)
           req.setRequestHeader('If-None-Match', that.lastETag);
-        if (that.authHeader)
-          req.setRequestHeader('Authorization', that.authHeader);
       },
 
       success: function(data, text, req) {
@@ -298,11 +281,13 @@
   };
 
   EventStream.prototype.setURL = function(url) {
+    if (url === '/')
+      url = '/events';
+
     // EventStream shouldn't touch the HTML but... whatever.
     $('.comp-text').text(url);
 
-    this.url = 'https://api.github.com/' + url;
-    this.rawURL = url;
+    this.url = 'https://api.github.com' + url;
     if (this.request) this.request.abort();
     this.populating = false;
     this.events = [];
