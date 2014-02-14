@@ -248,11 +248,12 @@
             that.events.push(value);
           });
         } else {
-          if (isOk) {
+          if (isOk || that.emptyPage) {
             that.events.push({
               type: 'Error',
               error: 'No more events to load! For now...'
             });
+            that.emptyPage = true;
             that.page = 1;
           } else {
             that.page++;
@@ -304,6 +305,7 @@
 
     this.url = 'https://api.github.com' + url;
     this.page = 1;
+    this.emptyPage = false;
     this.populating = false;
     this.events = [];
     this.ids = {};
