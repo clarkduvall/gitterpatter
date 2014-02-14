@@ -3,6 +3,13 @@ from flask import render_template
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
-@app.route('/')
-def index():
+
+@app.route('/callback')
+def callback():
+    return 'Callback'
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
     return render_template('index.html')
