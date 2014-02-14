@@ -8,7 +8,7 @@ app = Flask(__name__, static_url_path='', static_folder='static')
 
 @app.route('/callback')
 def callback():
-    return '%s' % request.args
+    return request.args.get('code', '')
 
 
 @app.route('/', defaults={'path': ''})
