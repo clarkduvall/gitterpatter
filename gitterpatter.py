@@ -9,7 +9,7 @@ from flask import request
 from flask import session
 from flask import url_for
 
-app = Flask(__name__, static_url_path='', static_folder='static')
+app = Flask(__name__, static_url_path='/s', static_folder='static')
 app.debug = True
 app.secret_key = os.environ['FLASK_SECRET']
 
@@ -38,7 +38,7 @@ def logout():
     return redirect(url_for('.index'))
 
 
-@app.route('/', defaults={'path': ''})
+@app.route('/')
 @app.route('/<path:path>')
-def index(path):
+def index(path=None):
     return render_template('index.html', token=session.get('access_token', ''))
