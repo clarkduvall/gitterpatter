@@ -1,0 +1,273 @@
+@import url(http://fonts.googleapis.com/css?family=Ruda);
+body {
+  color: #333333;
+  font: 13px Ruda, Helvetica, arial, freesans, clean, sans-serif;
+  margin: 0; }
+
+html,
+body,
+#gitter {
+  overflow: hidden; }
+
+.wrapper {
+  width: 312px;
+  height: 312px;
+  margin-top: -156px;
+  margin-left: -156px;
+  text-align: center;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  pointer-events: none; }
+
+.cover {
+  border: 48px solid #e5e5e5; }
+
+.drop {
+  background: #f3f3f3; }
+
+#gitter .cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 96px;
+  width: 96px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  -moz-box-sizing: border-box; }
+  #gitter .cover.splat {
+    border-width: 5px;
+    width: 312px;
+    height: 312px;
+    -webkit-transition: all 0.15s ease-out;
+    -moz-transition: all 0.15s ease-out;
+    transition: all 0.15s ease-out;
+    pointer-events: none; }
+#gitter .drop {
+  display: inline-block;
+  height: 96px;
+  width: 96px;
+  margin: 108px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  opacity: 1;
+  overflow: hidden;
+  font-size: 18px;
+  pointer-events: none; }
+  #gitter .drop .content {
+    display: none; }
+  #gitter .drop a {
+    pointer-events: auto;
+    text-decoration: none;
+    font-weight: bold;
+    color: inherit; }
+    #gitter .drop a:hover {
+      text-decoration: underline; }
+  #gitter .drop.splat {
+    margin: 0;
+    width: 312px;
+    height: 312px;
+    padding: 30px;
+    -webkit-transition: all 0.15s ease-out;
+    -moz-transition: all 0.15s ease-out;
+    transition: all 0.15s ease-out; }
+    #gitter .drop.splat .content {
+      display: block; }
+  #gitter .drop .avatar {
+    margin-bottom: 20px;
+    border-radius: 50%;
+    width: 96px;
+    height: 96px; }
+
+.PushEvent {
+  color: white; }
+  .PushEvent .cover {
+    border-color: #aaaaaa; }
+  .PushEvent .drop {
+    background: #333333; }
+
+.Error {
+  color: white; }
+  .Error .cover {
+    border-color: #ff8888; }
+  .Error .drop {
+    background: #990000; }
+
+.WatchEvent {
+  color: #333333; }
+  .WatchEvent .cover {
+    border-color: #333333; }
+  .WatchEvent .drop {
+    background: gold; }
+
+.ForkEvent {
+  color: white; }
+  .ForkEvent .cover {
+    border-color: #000044; }
+  .ForkEvent .drop {
+    background: #8888aa; }
+
+#controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 15px 10px rgba(255, 255, 255, 0.4);
+  border-bottom-right-radius: 40px;
+  padding: 0 20px 20px 0; }
+  #controls h1 {
+    font-size: 35px;
+    margin: 10px 0 0 5px; }
+  #controls h3 {
+    margin: 20px 0 5px 5px; }
+  #controls .by {
+    margin-left: 10px;
+    font-size: 16px;
+    color: #888888; }
+  #controls a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #333333; }
+    #controls a:hover {
+      text-decoration: underline; }
+  #controls .control-box {
+    border: 5px solid #666666;
+    border-left: none;
+    line-height: 0;
+    display: inline-block; }
+  #controls .toggle {
+    position: relative;
+    height: 64px;
+    width: 64px;
+    display: inline-block;
+    cursor: pointer; }
+    #controls .toggle.selected {
+      background: #e5e5e5; }
+    #controls .toggle:hover {
+      background: #f3f3f3; }
+  #controls .rate1:after {
+    position: absolute;
+    background: #888888;
+    width: 10px;
+    height: 10px;
+    top: 27px;
+    left: 27px;
+    border-radius: 50%;
+    content: ""; }
+  #controls .rate2:after {
+    position: absolute;
+    background: #888888;
+    width: 20px;
+    height: 20px;
+    top: 22px;
+    left: 22px;
+    border-radius: 50%;
+    content: ""; }
+  #controls .rate3:after {
+    position: absolute;
+    background: #888888;
+    width: 30px;
+    height: 30px;
+    top: 17px;
+    left: 17px;
+    border-radius: 50%;
+    content: ""; }
+  #controls .rate4:after {
+    position: absolute;
+    background: #888888;
+    width: 40px;
+    height: 40px;
+    top: 12px;
+    left: 12px;
+    border-radius: 50%;
+    content: ""; }
+  #controls .rate5:after {
+    position: absolute;
+    background: #888888;
+    width: 50px;
+    height: 50px;
+    top: 7px;
+    left: 7px;
+    border-radius: 50%;
+    content: ""; }
+  #controls .fade:after {
+    position: absolute;
+    top: 32px;
+    font-size: 20px;
+    font-weight: bold;
+    width: 64px;
+    text-align: center;
+    color: #888888; }
+  #controls .fade1:after {
+    content: ">"; }
+  #controls .fade2:after {
+    content: ">>"; }
+  #controls .fade3:after {
+    content: ">>>"; }
+  #controls .comp {
+    display: none;
+    margin-top: 5px; }
+  #controls .composition {
+    margin-left: 5px; }
+  #controls select {
+    border: 2px solid #666666;
+    outline: none;
+    background: #e5e5e5;
+    padding: 4px 10px;
+    color: #333333;
+    border-radius: 5px; }
+  #controls input {
+    border: 2px solid #666666;
+    outline: none;
+    background: #f3f3f3;
+    padding: 5px 10px;
+    color: #333333;
+    border-radius: 5px; }
+    #controls input:focus {
+      border-color: #aaaaaa; }
+  #controls button {
+    border: none;
+    background: #333333;
+    color: whitesmoke;
+    border-radius: 5px;
+    padding: 7px 12px;
+    margin-top: 5px;
+    font-weight: bold; }
+    #controls button:hover {
+      cursor: pointer;
+      background: #444444; }
+  #controls .social {
+    margin-top: 20px;
+    margin-left: 5px; }
+    #controls .social .btn {
+      margin-top: 5px; }
+  #controls .login-controls {
+    margin-top: 15px;
+    margin-left: 5px; }
+    #controls .login-controls .logout-msg,
+    #controls .login-controls .login-error,
+    #controls .login-controls form {
+      display: none; }
+    #controls .login-controls .login-error {
+      color: #dd0000;
+      margin-top: 5px;
+      font-weight: bold; }
+    #controls .login-controls input {
+      margin-top: 5px; }
+
+#key {
+  position: absolute;
+  right: 0;
+  bottom: 0; }
+
+.event {
+  border-radius: 50%;
+  background: #f3f3f3;
+  border: 5px solid #e5e5e5;
+  width: 64px;
+  height: 64px;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  line-height: 64px; }
