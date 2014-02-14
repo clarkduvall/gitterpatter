@@ -21,9 +21,11 @@
       <hr>
 
       <div class="login-controls">
-        <span class="login-msg">
-          <a class="login" href="https://github.com/login/oauth/authorize?client_id=05af174c57056e9063a5">Login</a> to GitHub to increase API limit and view private repos.
-        </span>
+        {% if token %}
+        You are logged in to GitHub! You can now view events for private repos.
+        {% else %}
+        <a class="login" href="https://github.com/login/oauth/authorize?client_id=05af174c57056e9063a5">Login</a> to GitHub to increase API limit and view private repos.
+        {% endif %}
       </div>
       <h3>Rain source - <span class="comp-text">events</span></h3>
       <form class="composition">

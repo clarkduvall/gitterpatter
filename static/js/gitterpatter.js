@@ -170,13 +170,14 @@
     return '';
   }
 
-  function EventStream(cb, newEventTime) {
+  function EventStream(cb, newEventTime, token) {
     var queryURL = getQueryURL();
 
     this.events = [];
     this.ids = {};
     this.timer = 0;
-    this.newEventTime = newEventTime || 1;
+    this.newEventTime = newEventTime;
+    this.token = token;
     this.callback = cb;
     this.setURL(queryURL || 'events');
   }
@@ -221,11 +222,16 @@
   };
 
   EventStream.prototype.fetch = function(cb) {
-    var that = this;
+    var that = this,
+        data = {};
+
+    if (this.token)
+      data['access_token'] = this.token;
 
     this.request = $.ajax({
       dataType: 'json',
       url: this.url,
+      data: data,
       beforeSend: function(req) {
         if (that.lastETag)
           req.setRequestHeader('If-None-Match', that.lastETag);
@@ -473,7 +479,7 @@
 
   $(function() {
     var list = new ActivityList(),
-        stream = new EventStream(list.add.bind(list), 1),
+        stream = new EventStream(list.add.bind(list), 1, GITHUB_TOKEN),
         animator = new Animator([list, stream]);
 
     animator.step();
