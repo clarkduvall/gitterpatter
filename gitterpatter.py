@@ -28,13 +28,13 @@ def callback():
     if response.ok:
         session['access_token'] =  response.json()['access_token']
 
-    return redirect(url_for('.index'))
+    return redirect(url_for('.index', scheme='https'))
 
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('.index'))
+    return redirect(url_for('.index', scheme='https'))
 
 
 @app.route('/')
