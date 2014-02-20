@@ -17,6 +17,12 @@ GITHUB_CLIENT_ID = os.environ['GITHUB_CLIENT_ID']
 GITHUB_CLIENT_SECRET = os.environ['GITHUB_CLIENT_SECRET']
 
 
+def https_url_for(*args, **kwargs):
+    kwargs['_scheme'] = 'https'
+    kwargs['_external'] = True
+    return url_for(*args, **kwargs)
+
+
 @app.route('/callback')
 def callback():
     response = requests.post(ACCESS_TOKEN_URL, params={
@@ -28,13 +34,13 @@ def callback():
     if response.ok:
         session['access_token'] =  response.json()['access_token']
 
-    return redirect(url_for('.index', scheme='https'))
+    return redirect(https_url_for('.index'))
 
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('.index', scheme='https'))
+    return redirect(https_url_for('.index'))
 
 
 @app.route('/')
